@@ -2,46 +2,38 @@
 
 	require_once 'core/init.php';
 	
-			
-	
-	$token= new Token();
-	//$token=$token->session_name;
+	$token = new Token();
 
-
-	$validation = new Validation();
-	
-
-	
-	//echo '<pre>';
-	//var_dump($validation);
-	
 	if(Input::exists()){
-		$validate = $validation->check(array(
-		'name'			 => array(
-			'required' => true,
-			'min'	   => 2,
-			'max'	   =>50,
-			'special_char' => '/^[a-zA-Z ]*$/'
-		),	
-		'username'		 =>array(		
-			'required' => true,
-			'min'	   => 2,
-			'max'	   => 20,
-			'unique'   => 'users'
-		),	
-			
-		'password' 	   => array(
-			'required' => true,
-			'min'	   => 8,
-			'special_char' => '/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'
-		),
-		
-		'confirm_password' =>array(
-			'required' => true,
-			'matches' => 'password'
-		)
-	));
-	
+		if(Token::check(Input::get('user'))) {
+
+			$validation = new Validation();
+				$validate = $validation->check(array(
+						'name'						  => array(
+								'required'		  => true,
+								'min'	  			  => 2,
+								'max'	  			  =>50,
+								'special_char'  => '/^[a-zA-Z ]*$/'
+							),
+							'username'			  => array(
+								 'required'	    => true,
+								 'min'	  	    => 2,
+								 'max' 					=> 20,
+								 'unique'  	    => 'users'
+							 ),
+
+							'password' 	  	  => array(
+									'required' 	  => true,
+									'min'				  => 8,
+									'special_char'=> '/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'
+								),
+
+						'confirm_password'  => array(
+								  'required' 		=> true,
+									'matches' 		=> 'password'
+								)
+					));
+
 	if($validate->passed()){
 		Session::flash('success', 'You registred successfully!');
 		//echo Session::flash('success');
@@ -49,26 +41,23 @@
 		exit();
 	}
 }
-	
+}
+
 Helper::getHeader('Algebra Contacts');
 
-
-		//echo '<pre>';
-		//var_dump($validation);
-		//echo '<pre>';
-						
 ?>
 
 
 
 <div class="row">
-	<div class="col-md-4 col-md-offset-4">	
+	<div class="col-md-4 col-md-offset-4">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 				<h3 class="panel-title">Create an account</h3>
 			</div>
 			<div class="panel-body">
 				<form method="post">
+				<input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
 					<div class="form-group <?php echo ($validation->hasError('name')) ? 'has-error' : ''; ?>">
 						<label for="name" class="control-label">Name*</label>
 						<input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" value="<?php echo escape(Input::get('name')) ?>">
@@ -78,26 +67,26 @@ Helper::getHeader('Algebra Contacts');
 						<label for="username" class="control-label">Username*</label>
 						<input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" autocomplete="off">
 						<?php echo ($validation->hasError('username')) ? '<p class="text-danger">'.$validation->hasError('username').'</p>' : ''; ?>
-					</div>				
+					</div>
 					<div class="form-group <?php echo ($validation->hasError('password')) ? 'has-error' : ''; ?>">
 						<label for="password" class="control-label">Password*</label>
 						<input type="password" class="form-control" id="password" name="password" placeholder="Choose a password">
 						<?php echo ($validation->hasError('password')) ? '<p class="text-danger">'.$validation->hasError('password').'</p>' : ''; ?>
-					</div>				
+					</div>
 					<div class="form-group <?php echo ($validation->hasError('confirm_password')) ? 'has-error' : ''; ?>">
 						<label for="confirm_password" class="control-label">Confirm Password*</label>
 						<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Enter your password again">
 						<?php echo ($validation->hasError('confirm_password')) ? '<p class="text-danger">'.$validation->hasError('confirm_password').'</p>' : ''; ?>
-					</div>				
+					</div>
 					<div class="form-group">
 						<button type="submit" class="btn btn-primary"> Create an account </button>
 					</div>
-				</form>			
+				</form>
 			</div>
 		</div>
 	</div>
 </div>
-	
+
 <?php
 	Helper::getFooter();
 ?>
