@@ -6,11 +6,8 @@
 	
 	$token= new Token();
 	//$token=$token->session_name;
-		echo '<pre>';
-		var_dump($token);
-		echo '<pre>';
-	
-	
+
+
 	$validation = new Validation();
 	
 
@@ -23,7 +20,8 @@
 		'name'			 => array(
 			'required' => true,
 			'min'	   => 2,
-			'max'	   =>50
+			'max'	   =>50,
+			'special_char' => '/^[a-zA-Z ]*$/'
 		),	
 		'username'		 =>array(		
 			'required' => true,
@@ -34,7 +32,8 @@
 			
 		'password' 	   => array(
 			'required' => true,
-			'min'	   => 8
+			'min'	   => 8,
+			'special_char' => '/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'
 		),
 		
 		'confirm_password' =>array(
@@ -57,6 +56,7 @@ Helper::getHeader('Algebra Contacts');
 		//echo '<pre>';
 		//var_dump($validation);
 		//echo '<pre>';
+						
 ?>
 
 
@@ -69,7 +69,6 @@ Helper::getHeader('Algebra Contacts');
 			</div>
 			<div class="panel-body">
 				<form method="post">
-				<input type="hidden" name="token" value="<?php echo $token; ?>"/>
 					<div class="form-group <?php echo ($validation->hasError('name')) ? 'has-error' : ''; ?>">
 						<label for="name" class="control-label">Name*</label>
 						<input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" value="<?php echo escape(Input::get('name')) ?>">

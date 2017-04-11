@@ -20,7 +20,9 @@ class Validation
 				
 				$item = escape($item);
 				$value = trim($_POST[$item]);
+				
 				$item_print = $this->underscore($item);
+				
 				if($rule==='required'&& empty($value)){
 					$this->addError($item,"Field {$item_print} is required.");
 				} else if (!empty($value)){
@@ -46,18 +48,29 @@ class Validation
 								$this->addError($item, "{$item_print} already exists.");
 							}
 						break;
-						
-					}
+						case 'special_char':
+							if(!preg_match($rule_value ,$value)) {
+								if ($item === 'name'){
+									$this->addError($item, "Field {$item_print} allowes only letters and white spaces.");
+                                }elseif ($item === 'password') {
+                                        $this->addError($item, "Field {$item_print} must include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+                                }
+							}
+						break;			
+								
+								
+					}						
 				}
 			}
 		}
-		
+	
 		
 		if (empty($this->_errors)){
 			$this->_passed=true;
 		}	
 			return $this;		
-	}	
+			
+	}
 	
 		private function addError($item, $error)
 		{
