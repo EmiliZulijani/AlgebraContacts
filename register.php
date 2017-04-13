@@ -1,46 +1,65 @@
 <?php
 
 	require_once 'core/init.php';
-	
-	$token = new Token();
+
+
+
+	$validation = new Validation();
 
 	if(Input::exists()){
-		if(Token::check(Input::get('user'))) {
+		if(Token::getInstance()->check(Input::get('token'))){
 
-			$validation = new Validation();
 				$validate = $validation->check(array(
-						'name'						  => array(
+						'name'					  => array(
 								'required'		  => true,
-								'min'	  			  => 2,
-								'max'	  			  =>50,
-								'special_char'  => '/^[a-zA-Z ]*$/'
+								'min'	  		  => 2,
+								'max'	  		  =>50,
+								'special_char'    => '/^[a-zA-Z ]*$/'
 							),
 							'username'			  => array(
-								 'required'	    => true,
-								 'min'	  	    => 2,
-								 'max' 					=> 20,
-								 'unique'  	    => 'users'
+								 'required'	      => true,
+								 'min'	  	      => 2,
+								 'max' 		      => 20,
+								 'unique'  	      => 'users'
 							 ),
 
-							'password' 	  	  => array(
+							'password' 	  	      => array(
 									'required' 	  => true,
-									'min'				  => 8,
+									'min'		  => 8,
 									'special_char'=> '/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'
 								),
 
-						'confirm_password'  => array(
-								  'required' 		=> true,
-									'matches' 		=> 'password'
+						'confirm_password'        => array(
+								  'required' 	  => true,
+									'matches' 	  => 'password'
 								)
 					));
 
 	if($validate->passed()){
-		Session::flash('success', 'You registred successfully!');
-		//echo Session::flash('success');
-		header ('Location:login.php');
-		exit();
+
+		$salt = Hash::salt(32);
+		$password =Hash::make(Input::get('password'), $salt);
+
+		try {
+			User::registration (array(
+					'name'    => Input::get('name'),
+					'username'=> Input::get('username'),
+					'password'=> $password,
+					'salt'    => $salt,
+					'role_id' => 1)
+					);
+
+		} catch (Exception $e) {
+			die($e->getMessage());
+		}
+
+				Session::flash('success', 'You registred successfully!');
+				Redirect::to('login');
+
+		//header ('Location:login.php');
+		//exit();
+		}
 	}
-}
 }
 
 Helper::getHeader('Algebra Contacts');
@@ -57,7 +76,7 @@ Helper::getHeader('Algebra Contacts');
 			</div>
 			<div class="panel-body">
 				<form method="post">
-				<input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
+					<input type="hidden" name="token" value="<?php echo Token::getInstance()->generate(); ?>">
 					<div class="form-group <?php echo ($validation->hasError('name')) ? 'has-error' : ''; ?>">
 						<label for="name" class="control-label">Name*</label>
 						<input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" value="<?php echo escape(Input::get('name')) ?>">
